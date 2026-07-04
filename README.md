@@ -12,6 +12,24 @@ decisions (no Microsoft 365 dependency in the MVP).
 
 ## Local development
 
+### Quick start
+
+```
+docker compose up -d   # starts local Postgres
+npm run setup           # installs both apps, migrates, seeds demo data
+npm run dev              # runs backend (:4000) and frontend (:5173) together
+```
+
+Then open `http://localhost:5173` and sign in with `admin@firstassist.local`
+/ `changeme123` (see below for the other seeded logins). **Change this
+password before using anything beyond local dev.**
+
+If you already have Postgres running locally instead of via Docker,
+create a database/role matching `backend/.env.example`'s `DATABASE_URL`
+before running `npm run setup`.
+
+### Step by step
+
 1. Start Postgres (via Docker, or use an existing local instance):
    ```
    docker compose up -d
@@ -27,8 +45,7 @@ decisions (no Microsoft 365 dependency in the MVP).
    ```
    API runs on `http://localhost:4000`. The seed script creates the
    first login from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`
-   (defaults to `admin@firstassist.local` / `changeme123` — change
-   this before using anything beyond local dev), plus an
+   (defaults to `admin@firstassist.local` / `changeme123`), plus an
    `office@firstassist.local` and `tech@firstassist.local` login (same
    password) and a demo client/site/asset/job/inspection
    form/issue/parts/quote item so the app isn't empty on first run.
