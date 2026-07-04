@@ -4,6 +4,9 @@ import { useAuth } from "./auth/AuthContext";
 import { LoginPage } from "./auth/LoginPage";
 import { RequireAuth } from "./auth/RequireAuth";
 import { EntityListPage } from "./components/EntityListPage";
+import { InspectionFormDetailPage } from "./pages/InspectionFormDetailPage";
+import { InspectionFormsPage } from "./pages/InspectionFormsPage";
+import { JobDetailPage } from "./pages/JobDetailPage";
 import { JobsPage } from "./pages/JobsPage";
 import { PartsPage } from "./pages/PartsPage";
 import { QuoteItemsPage } from "./pages/QuoteItemsPage";
@@ -25,6 +28,7 @@ function Shell() {
         <NavLink to="/maintenance-schedules">Maintenance</NavLink>
         <NavLink to="/jobs">Jobs</NavLink>
         <NavLink to="/issues">Issues</NavLink>
+        <NavLink to="/inspection-forms">Inspection Forms</NavLink>
         <NavLink to="/parts">Parts / Price List</NavLink>
         <NavLink to="/quote-items">Quote Items</NavLink>
         <div className="nav-user">
@@ -40,6 +44,9 @@ function Shell() {
             return <Route key={key} path={path} element={<EntityListPage config={config} />} />;
           })}
           <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
+          <Route path="/inspection-forms" element={<InspectionFormsPage />} />
+          <Route path="/inspection-forms/:id" element={<InspectionFormDetailPage />} />
           <Route path="/parts" element={<PartsPage />} />
           <Route path="/quote-items" element={<QuoteItemsPage />} />
         </Routes>

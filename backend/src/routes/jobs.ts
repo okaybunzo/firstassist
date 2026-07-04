@@ -8,7 +8,9 @@ export const jobsRouter = crudRouter(prisma.job, {
     assignedTo: true,
     issues: true,
     attachments: true,
-    checklistResults: true,
+    checklistResults: {
+      include: { form: { include: { fields: { orderBy: { order: "asc" } } } }, answers: true },
+    },
     reports: true,
   },
 });

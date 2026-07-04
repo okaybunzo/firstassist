@@ -141,6 +141,14 @@ export const entities: EntityConfig[] = [
     ],
   },
   {
+    key: "inspection-forms",
+    label: "Inspection Forms",
+    fields: [
+      { key: "name", label: "Name", type: "text", required: true },
+      { key: "description", label: "Description", type: "text" },
+    ],
+  },
+  {
     key: "parts",
     label: "Parts / Price List",
     fields: [

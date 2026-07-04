@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api, UnauthorizedError } from "../api/client";
 import type { EntityConfig } from "../api/entities";
 
@@ -7,7 +7,13 @@ interface RelationOptions {
   [resource: string]: Array<{ id: string; label: string }>;
 }
 
-export function EntityListPage({ config }: { config: EntityConfig }) {
+export function EntityListPage({
+  config,
+  linkTo,
+}: {
+  config: EntityConfig;
+  linkTo?: (item: any) => string;
+}) {
   const navigate = useNavigate();
   const [items, setItems] = useState<any[]>([]);
   const [relationOptions, setRelationOptions] = useState<RelationOptions>({});
@@ -154,6 +160,7 @@ export function EntityListPage({ config }: { config: EntityConfig }) {
                   </td>
                 ))}
                 <td>
+                  {linkTo && <Link to={linkTo(item)}>View</Link>}{" "}
                   <button onClick={() => handleDelete(item.id)}>Delete</button>
                 </td>
               </tr>
