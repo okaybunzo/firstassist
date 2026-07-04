@@ -28,8 +28,12 @@ decisions (no Microsoft 365 dependency in the MVP).
    API runs on `http://localhost:4000`. The seed script creates the
    first login from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`
    (defaults to `admin@firstassist.local` / `changeme123` — change
-   this before using anything beyond local dev). Additional users can
-   be created afterwards by an admin via `POST /api/users`.
+   this before using anything beyond local dev), plus an
+   `office@firstassist.local` and `tech@firstassist.local` login (same
+   password) and a demo client/site/asset/job/inspection
+   form/issue/parts/quote item so the app isn't empty on first run.
+   Additional users can be created afterwards by an admin via
+   `POST /api/users`.
 3. Frontend:
    ```
    cd frontend
@@ -39,6 +43,28 @@ decisions (no Microsoft 365 dependency in the MVP).
    App runs on `http://localhost:5173` and proxies `/api` and `/uploads`
    to the backend. Every route except `/login` requires a signed-in
    session.
+
+## Testing
+
+- Backend: integration tests (Vitest + Supertest) run against a
+  separate `firstassist_test` database.
+  ```
+  cd backend
+  createdb firstassist_test   # first time only
+  npm test
+  ```
+  This runs `prisma migrate deploy` against `.env.test`, truncates all
+  tables, seeds a test admin, and exercises auth, CRUD, the
+  checklist/issue/photo/report job workflow, and price list
+  import/export.
+- Frontend: end-to-end tests (Playwright) drive the real UI against
+  the dev backend and database.
+  ```
+  cd frontend
+  npm run test:e2e
+  ```
+  This expects the backend to be migrated and seeded (see above) and
+  will start the dev servers itself if they aren't already running.
 
 ## Data & files
 

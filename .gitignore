@@ -8,8 +8,14 @@ build/
 # uploaded files / generated reports (local disk storage)
 backend/uploads/*
 !backend/uploads/.gitkeep
+backend/uploads-test/
 
 # Prisma
 backend/prisma/dev.db
+
+# Playwright
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
 
 .DS_Store

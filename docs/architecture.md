@@ -83,3 +83,16 @@ frontend/   React + Vite single-page app
 docs/       architecture notes
 docker-compose.yml   local Postgres for development
 ```
+
+## Testing
+
+- **Backend**: Vitest + Supertest integration tests (`backend/tests/`)
+  run against a dedicated `firstassist_test` Postgres database (never
+  the dev database), truncated and reseeded with a test admin before
+  each run. Coverage: auth (login/logout/session gating), CRUD,
+  role-gated user management, and the full job workflow (checklist
+  submission, issue creation, photo upload, PDF report generation),
+  plus price list import/quote export.
+- **Frontend**: Playwright end-to-end tests (`frontend/e2e/`) drive the
+  real UI against the dev backend/database, covering the same
+  auth/CRUD/job-workflow surface from the browser's perspective.
