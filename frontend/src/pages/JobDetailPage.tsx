@@ -55,9 +55,16 @@ interface Job {
   notes: string | null;
   site: { name: string; address: string | null; client: { name: string } };
   asset: { name: string; assetType: string | null } | null;
+  assignedTo: { id: string; name: string } | null;
   issues: Issue[];
   checklistResults: ChecklistResult[];
   reports: Report[];
+}
+
+interface UserOption {
+  id: string;
+  name: string;
+  role: string;
 }
 
 const JOB_STATUSES = ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
@@ -68,12 +75,16 @@ export function JobDetailPage() {
   const { user } = useAuth();
   const [job, setJob] = useState<Job | null>(null);
   const [forms, setForms] = useState<InspectionForm[]>([]);
+  const [users, setUsers] = useState<UserOption[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const canAllocate = user?.role === "ADMIN" || user?.role === "OFFICE";
 
   // Job summary edit state
   const [status, setStatus] = useState("");
   const [notes, setNotes] = useState("");
   const [completedDate, setCompletedDate] = useState("");
+  const [assignedToId, setAssignedToId] = useState("");
 
   // Checklist state
   const [selectedFormId, setSelectedFormId] = useState("");
@@ -92,11 +103,13 @@ export function JobDetailPage() {
     setStatus(data.status);
     setNotes(data.notes ?? "");
     setCompletedDate(data.completedDate ? data.completedDate.slice(0, 10) : "");
+    setAssignedToId(data.assignedTo?.id ?? "");
   }
 
   useEffect(() => {
     reload();
     api.list("inspection-forms").then(setForms);
+    if (canAllocate) api.list("users").then(setUsers);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -108,6 +121,7 @@ export function JobDetailPage() {
         status,
         notes: notes || null,
         completedDate: completedDate ? new Date(completedDate).toISOString() : null,
+        ...(canAllocate ? { assignedToId: assignedToId || null } : {}),
       });
       reload();
     } catch (err) {
@@ -200,6 +214,8 @@ export function JobDetailPage() {
           <dd>
             <span className="badge">{job.type}</span>
           </dd>
+          <dt>Assigned to</dt>
+          <dd>{job.assignedTo?.name ?? "Unassigned"}</dd>
         </dl>
 
         <form onSubmit={handleSaveSummary} className="inline-form">
@@ -221,6 +237,19 @@ export function JobDetailPage() {
             Notes
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
           </label>
+          {canAllocate && (
+            <label>
+              Assigned to
+              <select value={assignedToId} onChange={(e) => setAssignedToId(e.target.value)}>
+                <option value="">Unassigned</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.role})
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <button type="submit">Save</button>
         </form>
       </div>

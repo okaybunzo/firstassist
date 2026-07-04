@@ -7,3 +7,9 @@ export async function adminAgent() {
   await agent.post("/api/auth/login").send({ email: TEST_ADMIN_EMAIL, password: TEST_ADMIN_PASSWORD });
   return agent;
 }
+
+export async function agentAs(email: string, password: string) {
+  const agent = request.agent(app);
+  await agent.post("/api/auth/login").send({ email, password });
+  return agent;
+}

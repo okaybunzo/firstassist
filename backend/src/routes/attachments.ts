@@ -5,15 +5,38 @@ import { asyncHandler } from "./asyncHandler";
 
 export const attachmentsRouter = Router();
 
+/** For technicians, resolves the job (if any) that a job/issue-scoped attachment belongs to. */
+async function resolveJobId(jobId?: string, issueId?: string): Promise<string | undefined> {
+  if (jobId) return jobId;
+  if (issueId) return (await prisma.issue.findUnique({ where: { id: issueId } }))?.jobId;
+  return undefined;
+}
+
+async function assertTechnicianCanAccessJob(userId: string, jobId: string | undefined) {
+  if (!jobId) return true;
+  const job = await prisma.job.findUnique({ where: { id: jobId } });
+  return job?.assignedToId === userId;
+}
+
 attachmentsRouter.get(
   "/",
   asyncHandler(async (req, res) => {
     const { jobId, assetId, issueId } = req.query;
+    const jobIdStr = typeof jobId === "string" ? jobId : undefined;
+    const issueIdStr = typeof issueId === "string" ? issueId : undefined;
+
+    if (req.user!.role === "TECHNICIAN") {
+      const resolvedJobId = await resolveJobId(jobIdStr, issueIdStr);
+      if (resolvedJobId && !(await assertTechnicianCanAccessJob(req.user!.userId, resolvedJobId))) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+    }
+
     const attachments = await prisma.attachment.findMany({
       where: {
-        jobId: typeof jobId === "string" ? jobId : undefined,
+        jobId: jobIdStr,
         assetId: typeof assetId === "string" ? assetId : undefined,
-        issueId: typeof issueId === "string" ? issueId : undefined,
+        issueId: issueIdStr,
       },
       orderBy: { uploadedAt: "desc" },
     });
@@ -28,6 +51,13 @@ attachmentsRouter.post(
   asyncHandler(async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
     const { jobId, assetId, issueId } = req.body;
+
+    if (req.user!.role === "TECHNICIAN") {
+      const resolvedJobId = await resolveJobId(jobId || undefined, issueId || undefined);
+      if (resolvedJobId && !(await assertTechnicianCanAccessJob(req.user!.userId, resolvedJobId))) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+    }
 
     const attachment = await prisma.attachment.create({
       data: {

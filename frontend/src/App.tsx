@@ -1,4 +1,4 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { Navigate, NavLink, Route, Routes } from "react-router-dom";
 import { entities } from "./api/entities";
 import { useAuth } from "./auth/AuthContext";
 import { LoginPage } from "./auth/LoginPage";
@@ -8,6 +8,7 @@ import { InspectionFormDetailPage } from "./pages/InspectionFormDetailPage";
 import { InspectionFormsPage } from "./pages/InspectionFormsPage";
 import { JobDetailPage } from "./pages/JobDetailPage";
 import { JobsPage } from "./pages/JobsPage";
+import { MyJobsPage } from "./pages/MyJobsPage";
 import { PartsPage } from "./pages/PartsPage";
 import { QuoteItemsPage } from "./pages/QuoteItemsPage";
 
@@ -15,40 +16,55 @@ const simpleEntityKeys = ["clients", "sites", "assets", "maintenance-schedules",
 
 function Shell() {
   const { user, logout } = useAuth();
+  const isTechnician = user?.role === "TECHNICIAN";
 
   return (
     <div className="app">
       <nav>
         <h1>FirstAssist</h1>
-        <NavLink to="/" end>
-          Clients
-        </NavLink>
-        <NavLink to="/sites">Sites</NavLink>
-        <NavLink to="/assets">Assets</NavLink>
-        <NavLink to="/maintenance-schedules">Maintenance</NavLink>
-        <NavLink to="/jobs">Jobs</NavLink>
-        <NavLink to="/issues">Issues</NavLink>
-        <NavLink to="/inspection-forms">Inspection Forms</NavLink>
-        <NavLink to="/parts">Parts / Price List</NavLink>
-        <NavLink to="/quote-items">Quote Items</NavLink>
+        {isTechnician ? (
+          <NavLink to="/jobs" end>
+            My Jobs
+          </NavLink>
+        ) : (
+          <>
+            <NavLink to="/" end>
+              Clients
+            </NavLink>
+            <NavLink to="/sites">Sites</NavLink>
+            <NavLink to="/assets">Assets</NavLink>
+            <NavLink to="/maintenance-schedules">Maintenance</NavLink>
+            <NavLink to="/jobs">Jobs</NavLink>
+            <NavLink to="/issues">Issues</NavLink>
+            <NavLink to="/inspection-forms">Inspection Forms</NavLink>
+            <NavLink to="/parts">Parts / Price List</NavLink>
+            <NavLink to="/quote-items">Quote Items</NavLink>
+          </>
+        )}
         <div className="nav-user">
-          <span>{user?.name}</span>
+          <span>
+            {user?.name} ({user?.role})
+          </span>
           <button onClick={() => logout()}>Log out</button>
         </div>
       </nav>
       <main>
         <Routes>
-          {simpleEntityKeys.map((key) => {
-            const config = entities.find((e) => e.key === key)!;
-            const path = key === "clients" ? "/" : `/${key}`;
-            return <Route key={key} path={path} element={<EntityListPage config={config} />} />;
-          })}
-          <Route path="/jobs" element={<JobsPage />} />
+          {isTechnician && <Route path="/" element={<Navigate to="/jobs" replace />} />}
+          {!isTechnician &&
+            simpleEntityKeys.map((key) => {
+              const config = entities.find((e) => e.key === key)!;
+              const path = key === "clients" ? "/" : `/${key}`;
+              return <Route key={key} path={path} element={<EntityListPage config={config} />} />;
+            })}
+          <Route path="/jobs" element={isTechnician ? <MyJobsPage /> : <JobsPage />} />
           <Route path="/jobs/:id" element={<JobDetailPage />} />
-          <Route path="/inspection-forms" element={<InspectionFormsPage />} />
-          <Route path="/inspection-forms/:id" element={<InspectionFormDetailPage />} />
-          <Route path="/parts" element={<PartsPage />} />
-          <Route path="/quote-items" element={<QuoteItemsPage />} />
+          {!isTechnician && <Route path="/inspection-forms" element={<InspectionFormsPage />} />}
+          {!isTechnician && (
+            <Route path="/inspection-forms/:id" element={<InspectionFormDetailPage />} />
+          )}
+          {!isTechnician && <Route path="/parts" element={<PartsPage />} />}
+          {!isTechnician && <Route path="/quote-items" element={<QuoteItemsPage />} />}
         </Routes>
       </main>
     </div>

@@ -55,6 +55,24 @@ endpoints and should not require changing the core data model.
   provider in the MVP — Entra ID login is a later, optional addition
   that replaces this without changing the rest of the data model.
 
+## Job allocation and role-based visibility
+
+- Admin/office staff see and manage every client, site, asset, job,
+  price list item, etc., and allocate jobs to a technician via
+  `Job.assignedToId`.
+- Technicians only see jobs allocated to them (`GET /api/jobs` and
+  `GET /api/jobs/:id` are scoped server-side to `assignedToId`, not
+  just hidden in the UI), and can only update a limited set of fields
+  on their own jobs (status, notes, completed date) — not reassign,
+  retitle, or delete a job. Issues/checklist results they create are
+  likewise checked against the job's assignment before the write is
+  allowed, and list endpoints for those resources are scoped the same
+  way as jobs.
+- The frontend nav reflects this: technicians see a single "My Jobs"
+  view instead of the full CRM/pricing surface; admin/office see
+  everything, including an "assigned to" picker on job creation and
+  the job detail page.
+
 ## Data model
 
 See `backend/prisma/schema.prisma` for the full schema. Core entities:

@@ -111,6 +111,13 @@ export const entities: EntityConfig[] = [
         options: ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"],
       },
       { key: "scheduledDate", label: "Scheduled date", type: "date" },
+      {
+        key: "assignedToId",
+        label: "Assigned to",
+        type: "relation",
+        relation: { resource: "users", labelKey: "name" },
+        listValue: (item) => item.assignedTo?.name ?? "Unassigned",
+      },
     ],
   },
   {
