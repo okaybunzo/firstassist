@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+.env
+*.log
+*.tsbuildinfo
+
+# uploaded files / generated reports (local disk storage)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Prisma
+backend/prisma/dev.db
+
+.DS_Store
