@@ -22,9 +22,14 @@ decisions (no Microsoft 365 dependency in the MVP).
    cp .env.example .env
    npm install
    npm run prisma:migrate
+   npm run prisma:seed
    npm run dev
    ```
-   API runs on `http://localhost:4000`.
+   API runs on `http://localhost:4000`. The seed script creates the
+   first login from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`
+   (defaults to `admin@firstassist.local` / `changeme123` — change
+   this before using anything beyond local dev). Additional users can
+   be created afterwards by an admin via `POST /api/users`.
 3. Frontend:
    ```
    cd frontend
@@ -32,7 +37,8 @@ decisions (no Microsoft 365 dependency in the MVP).
    npm run dev
    ```
    App runs on `http://localhost:5173` and proxies `/api` and `/uploads`
-   to the backend.
+   to the backend. Every route except `/login` requires a signed-in
+   session.
 
 ## Data & files
 

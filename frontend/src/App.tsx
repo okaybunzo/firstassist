@@ -1,5 +1,8 @@
 import { NavLink, Route, Routes } from "react-router-dom";
 import { entities } from "./api/entities";
+import { useAuth } from "./auth/AuthContext";
+import { LoginPage } from "./auth/LoginPage";
+import { RequireAuth } from "./auth/RequireAuth";
 import { EntityListPage } from "./components/EntityListPage";
 import { JobsPage } from "./pages/JobsPage";
 import { PartsPage } from "./pages/PartsPage";
@@ -7,7 +10,9 @@ import { QuoteItemsPage } from "./pages/QuoteItemsPage";
 
 const simpleEntityKeys = ["clients", "sites", "assets", "maintenance-schedules", "issues"];
 
-export default function App() {
+function Shell() {
+  const { user, logout } = useAuth();
+
   return (
     <div className="app">
       <nav>
@@ -22,6 +27,10 @@ export default function App() {
         <NavLink to="/issues">Issues</NavLink>
         <NavLink to="/parts">Parts / Price List</NavLink>
         <NavLink to="/quote-items">Quote Items</NavLink>
+        <div className="nav-user">
+          <span>{user?.name}</span>
+          <button onClick={() => logout()}>Log out</button>
+        </div>
       </nav>
       <main>
         <Routes>
@@ -36,5 +45,21 @@ export default function App() {
         </Routes>
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/*"
+        element={
+          <RequireAuth>
+            <Shell />
+          </RequireAuth>
+        }
+      />
+    </Routes>
   );
 }

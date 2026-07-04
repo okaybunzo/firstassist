@@ -49,6 +49,11 @@ endpoints and should not require changing the core data model.
 - **PDF generation**: `pdfkit` (server-side, no headless browser
   dependency).
 - **Excel/CSV import-export**: `exceljs`.
+- **Auth**: local email/password login (bcrypt-hashed passwords), an
+  httpOnly JWT cookie for the session, and role checks (`ADMIN`,
+  `OFFICE`, `TECHNICIAN`) on the `User` model. No external identity
+  provider in the MVP — Entra ID login is a later, optional addition
+  that replaces this without changing the rest of the data model.
 
 ## Data model
 

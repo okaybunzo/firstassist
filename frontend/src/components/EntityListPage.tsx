@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../api/client";
+import { useNavigate } from "react-router-dom";
+import { api, UnauthorizedError } from "../api/client";
 import type { EntityConfig } from "../api/entities";
 
 interface RelationOptions {
@@ -7,6 +8,7 @@ interface RelationOptions {
 }
 
 export function EntityListPage({ config }: { config: EntityConfig }) {
+  const navigate = useNavigate();
   const [items, setItems] = useState<any[]>([]);
   const [relationOptions, setRelationOptions] = useState<RelationOptions>({});
   const [form, setForm] = useState<Record<string, string>>({});
@@ -19,6 +21,7 @@ export function EntityListPage({ config }: { config: EntityConfig }) {
       const data = await api.list(config.key);
       setItems(data);
     } catch (e) {
+      if (e instanceof UnauthorizedError) return navigate("/login", { replace: true });
       setError(String(e));
     } finally {
       setLoading(false);

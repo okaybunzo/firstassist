@@ -1,6 +1,11 @@
 const API_BASE = "/api";
 
+export class UnauthorizedError extends Error {}
+
 async function handle(res: Response) {
+  if (res.status === 401) {
+    throw new UnauthorizedError("Not authenticated");
+  }
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`${res.status} ${res.statusText}: ${body}`);
